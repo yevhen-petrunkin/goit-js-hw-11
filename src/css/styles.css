@@ -54,6 +54,27 @@ button:focus {
   text-align: center;
 }
 
+.container {
+  width: 100%;
+  padding: 0 15px;
+  margin: 0 auto;
+}
+@media screen and (min-width: 480px) {
+  .container {
+    width: 480px;
+  }
+}
+@media screen and (min-width: 768px) {
+  .container {
+    width: 768px;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .container {
+    width: 1200px;
+  }
+}
+
 .gallery {
   display: flex;
   align-items: center;
@@ -65,26 +86,27 @@ button:focus {
   padding-top: 15px;
   padding-bottom: 15px;
   color: black;
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .gallery__item {
-  max-width: 375px;
+  width: 281px;
+  height: 220px;
   box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
   border-radius: 4px;
   overflow: hidden;
 }
 
-.gallery__image:hover {
-  transform: scale(1.03);
+.gallery__image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  transition: transform 300ms linear;
 }
 
-.gallery__image {
-  height: 100%;
-  width: 100%;
-  object-fit: cover;
-  transition: transform var(--animation-duration) var(--timing-function);
+.gallery__image:hover {
+  transform: scale(1.03);
 }
 
 .gallery__link {
@@ -103,6 +125,7 @@ button:focus {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  padding-top: 10px;
   padding-bottom: 10px;
 }
 
