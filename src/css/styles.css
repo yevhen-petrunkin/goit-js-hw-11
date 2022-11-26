@@ -1,25 +1,79 @@
-:root {
-  --timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  --animation-duration: 250ms;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+body {
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+input {
+  padding: 8px;
+  font: inherit;
+  border-radius: 4px;
+}
+
+h1,
+h2,
+h3,
+p {
+  padding: 0;
+  margin: 0;
+}
+
+button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bolder;
+  border: 1px solid rgb(218, 218, 255);
+  color: blue;
+  background-color: rgb(218, 218, 255);
+  transition: background-color 200ms linear, color 200ms linear;
+}
+
+button:hover,
+button:focus {
+  color: rgb(218, 218, 255);
+  background-color: blue;
+}
+
+.search__form {
+  background-color: blue;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  text-align: center;
 }
 
 .gallery {
-  display: grid;
-  max-width: 1140px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  grid-auto-rows: 240px;
-  grid-gap: 12px;
-  justify-content: center;
-  padding: 0;
-  list-style: none;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-right: 15px;
+  margin-left: 15px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color: black;
+  font-size: 18px;
 }
 
 .gallery__item {
-  position: relative;
+  max-width: 375px;
   box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
     0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .gallery__image:hover {
@@ -37,8 +91,26 @@
   display: block;
   text-decoration: none;
   height: 100%;
+  color: inherit;
 }
 
 .gallery__link:hover {
   cursor: zoom-in;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.info__item {
+  text-align: center;
+}
+
+.info__data {
+  display: block;
+  text-align: center;
 }
