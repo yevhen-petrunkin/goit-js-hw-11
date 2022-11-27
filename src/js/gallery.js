@@ -13,6 +13,7 @@ const searchParams = new URLSearchParams({
   per_page: 40,
 });
 
+let gallery = null;
 let markup = '';
 let pageCounter = 1;
 let totalHits = 0;
@@ -22,20 +23,25 @@ const FAIL_MESSAGE =
 const END_OF_GALLERY_MESSAGE =
   "We're sorry, but you've reached the end of search results.";
 
+let observer = new IntersectionObserver(onEntry, {
+  rootMargin: '300px',
+});
+
 const refs = {
   searchFormRef: document.querySelector('#search-form'),
   galleryRef: document.querySelector('.gallery'),
-  loadMoreBtnRef: document.querySelector('.load-more'),
+  triggerRef: document.querySelector('.trigger'),
 };
 
+observer.observe(refs.triggerRef);
+
 refs.searchFormRef.addEventListener('submit', onSearchFormSubmit);
-refs.loadMoreBtnRef.addEventListener('click', onLoadMore);
-refs.galleryRef.addEventListener('click', () => (isScrollActive = false));
 
 function onSearchFormSubmit(evt) {
   evt.preventDefault();
   resetGallery();
   resetPageCounter();
+  setPageValue(pageCounter);
   const query = evt.currentTarget.elements.searchQuery.value.trim();
   if (query === '') {
     return;
@@ -49,12 +55,44 @@ function onSearchFormSubmit(evt) {
   });
 }
 
-function enableSmoothScroll() {
-  const { height } = refs.galleryRef.firstElementChild.getBoundingClientRect();
-  window.scrollBy({
-    top: height * 2,
-    behavior: 'smooth',
+async function fetchSearchQuery() {
+  try {
+    const response = await axios.get(`${BASE_URL}/?${searchParams}`);
+    data = await response.data;
+    return data;
+  } catch (error) {
+    console.log('Error:', error.message);
+  }
+}
+
+function enableLargeImagesInGallery() {
+  gallery = new SimpleLightbox('.gallery a');
+  gallery.on('show.simplelightbox', function (evt) {
+    evt.preventDefault();
+    if (!evt.target.classList.contains('gallery__image')) {
+      return;
+    }
   });
+}
+
+function resetGalleryLightbox() {
+  gallery.refresh();
+}
+
+function onLoadMore() {
+  if (markup !== '') {
+    countTotalHits();
+    if (totalHits <= 0) {
+      notifyOnEnd();
+      return;
+    }
+    countPage();
+    setPageValue(pageCounter);
+    fetchSearchQuery().then(data => {
+      createCardMarkup(data);
+      resetGalleryLightbox();
+    });
+  }
 }
 
 function notifyOnNewQuery() {
@@ -68,15 +106,6 @@ function notifyOnNewQuery() {
 
 function setSearchQueryValue(query) {
   searchParams.set('q', query);
-}
-
-async function fetchSearchQuery() {
-  try {
-    const response = await axios.get(`${BASE_URL}/?${searchParams}`);
-    return await response.data;
-  } catch (error) {
-    console.log('Error:', error.message);
-  }
 }
 
 function createCardMarkup(data) {
@@ -101,33 +130,9 @@ function appendMarkupToGallery(markup) {
   refs.galleryRef.insertAdjacentHTML('beforeend', markup);
 }
 
-function enableLargeImagesInGallery() {
-  let gallery = new SimpleLightbox('.gallery a');
-  gallery.on('show.simplelightbox', function (evt) {
-    evt.preventDefault();
-    if (!evt.target.classList.contains('gallery__image')) {
-      return;
-    }
-  });
-}
-
 function notifyOnFail() {
   Notiflix.Notify.failure(FAIL_MESSAGE, {
     timeout: 3000,
-  });
-}
-
-function onLoadMore() {
-  countTotalHits();
-  if (totalHits <= 0) {
-    notifyOnEnd();
-    return;
-  }
-  countPage();
-  setPageValue(pageCounter);
-  fetchSearchQuery().then(data => {
-    createCardMarkup(data);
-    enableSmoothScroll();
   });
 }
 
@@ -146,10 +151,12 @@ function getPerPageValue() {
 }
 
 function resetGallery() {
+  totalHits = 0;
   refs.galleryRef.innerHTML = '';
 }
 function resetPageCounter() {
   pageCounter = 1;
+  return pageCounter;
 }
 
 function setTotalHits(data) {
@@ -158,9 +165,26 @@ function setTotalHits(data) {
 
 function countPage() {
   pageCounter += 1;
+  return pageCounter;
 }
 
 function countTotalHits() {
   totalHits -= getPerPageValue();
   console.log(totalHits);
 }
+
+function onEntry(entries) {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !totalHits <= 0) {
+      onLoadMore();
+    }
+  });
+}
+
+// function enableSmoothScroll() {
+//   const { height } = refs.galleryRef.firstElementChild.getBoundingClientRect();
+//   window.scrollBy({
+//     top: height * 2,
+//     behavior: 'smooth',
+//   });
+// }
