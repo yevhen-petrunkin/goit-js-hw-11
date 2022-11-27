@@ -2,12 +2,7 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-
-const BASE_URL = 'https://pixabay.com/api';
-const FAIL_MESSAGE =
-  'Sorry, there are no images matching your search query. Please try again.';
-const END_OF_GALLERY_MESSAGE =
-  "We're sorry, but you've reached the end of search results.";
+import throttle from 'lodash.throttle';
 
 const searchParams = new URLSearchParams({
   key: '31610284-d2a9adb661769c66f83a1d1f1',
@@ -19,9 +14,15 @@ const searchParams = new URLSearchParams({
   per_page: 40,
 });
 
+let isScrollActive = false;
 let markup = '';
 let pageCounter = 1;
 let totalHits = 0;
+const BASE_URL = 'https://pixabay.com/api';
+const FAIL_MESSAGE =
+  'Sorry, there are no images matching your search query. Please try again.';
+const END_OF_GALLERY_MESSAGE =
+  "We're sorry, but you've reached the end of search results.";
 
 const refs = {
   searchFormRef: document.querySelector('#search-form'),
@@ -31,6 +32,7 @@ const refs = {
 
 refs.searchFormRef.addEventListener('submit', onSearchFormSubmit);
 refs.loadMoreBtnRef.addEventListener('click', onLoadMore);
+refs.galleryRef.addEventListener('click', () => (isScrollActive = false));
 
 function onSearchFormSubmit(evt) {
   evt.preventDefault();
@@ -45,6 +47,22 @@ function onSearchFormSubmit(evt) {
     setTotalHits(data);
     createCardMarkup(data);
     enableLargeImagesInGallery();
+    notifyOnNewQuery();
+  });
+}
+
+function enableSmoothScroll() {
+  const { height } = refs.galleryRef.firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: height * 2,
+    behavior: 'smooth',
+  });
+}
+
+function notifyOnNewQuery() {
+  const NEW_QUERY_MESSAGE = `Hooray! We found ${totalHits} images.`;
+  Notiflix.Notify.success(NEW_QUERY_MESSAGE, {
+    timeout: 3000,
   });
 }
 
@@ -107,7 +125,10 @@ function onLoadMore() {
   }
   countPage();
   setPageValue(pageCounter);
-  fetchSearchQuery().then(createCardMarkup);
+  fetchSearchQuery().then(data => {
+    createCardMarkup(data);
+    enableSmoothScroll();
+  });
 }
 
 function notifyOnEnd() {
