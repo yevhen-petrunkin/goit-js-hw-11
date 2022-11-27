@@ -2,7 +2,6 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import throttle from 'lodash.throttle';
 
 const searchParams = new URLSearchParams({
   key: '31610284-d2a9adb661769c66f83a1d1f1',
@@ -14,7 +13,6 @@ const searchParams = new URLSearchParams({
   per_page: 40,
 });
 
-let isScrollActive = false;
 let markup = '';
 let pageCounter = 1;
 let totalHits = 0;
@@ -60,10 +58,12 @@ function enableSmoothScroll() {
 }
 
 function notifyOnNewQuery() {
-  const NEW_QUERY_MESSAGE = `Hooray! We found ${totalHits} images.`;
-  Notiflix.Notify.success(NEW_QUERY_MESSAGE, {
-    timeout: 3000,
-  });
+  if (totalHits > 0) {
+    const NEW_QUERY_MESSAGE = `Hooray! We found ${totalHits} images.`;
+    Notiflix.Notify.success(NEW_QUERY_MESSAGE, {
+      timeout: 3000,
+    });
+  }
 }
 
 function setSearchQueryValue(query) {
@@ -164,27 +164,3 @@ function countTotalHits() {
   totalHits -= getPerPageValue();
   console.log(totalHits);
 }
-
-/* <div class="gallery__item photo-card">
-  <a class="gallery__link" href="">
-    <img class="gallery__image" src="./cat.jpg" alt="" loading="lazy" />
-    <div class="info">
-      <p class="info__item">
-        <b>Likes</b>
-        <span class="info__data">234</span>
-      </p>
-      <p class="info__item">
-        <b>Views</b>
-        <span class="info__data">234</span>
-      </p>
-      <p class="info__item">
-        <b>Comments</b>
-        <span class="info__data">234</span>
-      </p>
-      <p class="info__item">
-        <b>Downloads</b>
-        <span class="info__data">234</span>
-      </p>
-    </div>
-  </a>
-</div> */
