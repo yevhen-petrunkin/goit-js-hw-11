@@ -58,7 +58,7 @@ function onSearchFormSubmit(evt) {
 async function fetchSearchQuery() {
   try {
     const response = await axios.get(`${BASE_URL}/?${searchParams}`);
-    data = await response.data;
+    const data = await response.data;
     return data;
   } catch (error) {
     console.log('Error:', error.message);
