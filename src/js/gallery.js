@@ -180,11 +180,3 @@ function onEntry(entries) {
     }
   });
 }
-
-// function enableSmoothScroll() {
-//   const { height } = refs.galleryRef.firstElementChild.getBoundingClientRect();
-//   window.scrollBy({
-//     top: height * 2,
-//     behavior: 'smooth',
-//   });
-// }
