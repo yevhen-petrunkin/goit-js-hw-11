@@ -79,7 +79,7 @@ button:focus {
 .gallery {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 15px;
   color: black;
