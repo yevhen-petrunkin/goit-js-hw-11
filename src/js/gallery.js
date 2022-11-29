@@ -47,19 +47,24 @@ function onSearchFormSubmit(evt) {
     return;
   }
   setSearchQueryValue(query);
-  fetchSearchQuery().then(data => {
-    setTotalHits(data);
-    createCardMarkup(data);
-    enableLargeImagesInGallery();
-    notifyOnNewQuery();
-  });
+  fetchSearchQuery();
 }
 
 async function fetchSearchQuery() {
   try {
     const response = await axios.get(`${BASE_URL}/?${searchParams}`);
     const data = await response.data;
-    return data;
+    if (pageCounter === 1) {
+      setTotalHits(data);
+    }
+    createCardMarkup(data);
+    if (pageCounter === 1) {
+      enableLargeImagesInGallery();
+      notifyOnNewQuery();
+    }
+    if (pageCounter !== 1) {
+      resetGalleryLightbox();
+    }
   } catch (error) {
     console.log('Error:', error.message);
   }
@@ -88,10 +93,7 @@ function onLoadMore() {
     }
     countPage();
     setPageValue(pageCounter);
-    fetchSearchQuery().then(data => {
-      createCardMarkup(data);
-      resetGalleryLightbox();
-    });
+    fetchSearchQuery();
   }
 }
 
@@ -170,7 +172,6 @@ function countPage() {
 
 function countTotalHits() {
   totalHits -= getPerPageValue();
-  console.log(totalHits);
 }
 
 function onEntry(entries) {
